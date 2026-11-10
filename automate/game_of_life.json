@@ -1,0 +1,21 @@
+{
+  "nume": "Game of Life",
+  "tip": "vecini",
+  "stari": { "DEAD": ".", "ALIVE": "O" },
+  "vecini": "moore",
+  "generatii": 8,
+  "matrice": [
+    ".O......",
+    "..O.....",
+    "OOO.....",
+    "........",
+    "........"
+  ],
+  "numara": "ALIVE",
+
+  "reguli": [
+    { "din": "ALIVE", "in": "DEAD",  "daca": "ALIVE", "semn": "<",  "nr": 2 },
+    { "din": "ALIVE", "in": "DEAD",  "daca": "ALIVE", "semn": ">",  "nr": 3 },
+    { "din": "DEAD",  "in": "ALIVE", "daca": "ALIVE", "semn": "==", "nr": 3 }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "nume": "Sandpile",
+  "tip": "numere",
+  "vecini": "von_neumann",
+  "generatii": 10,
+  "matrice": [
+    "0 1 2",
+    "2 8 1",
+    "1 2 0"
+  ],
+  "numara": 3,
+
+  "formula": "x - 4 * (x >= 4) + sum(1 for v in vecini if v >= 4)"
+}

@@ -1,0 +1,19 @@
+{
+  "nume": "Forest Fire",
+  "tip": "vecini",
+  "stari": { "EMPTY": ".", "TREE": "T", "FIRE": "F" },
+  "vecini": "moore",
+  "generatii": 5,
+  "matrice": [
+    "TTTT.",
+    "TT.TT",
+    ".TFTT",
+    "TTTTT"
+  ],
+  "numara": "TREE",
+
+  "reguli": [
+    { "din": "FIRE", "in": "EMPTY" },
+    { "din": "TREE", "in": "FIRE", "daca": "FIRE", "semn": ">=", "nr": 1 }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "nume": "Brian's Brain",
+  "tip": "vecini",
+  "stari": { "OFF": ".", "FIRING": "F", "DYING": "D" },
+  "vecini": "moore",
+  "generatii": 10,
+  "matrice": [
+    "..........",
+    "....F.....",
+    "...F.F....",
+    "..........",
+    ".....FF...",
+    ".........."
+  ],
+  "numara": "FIRING",
+
+  "reguli": [
+    { "din": "FIRING", "in": "DYING" },
+    { "din": "DYING",  "in": "OFF" },
+    { "din": "OFF",    "in": "FIRING", "daca": "FIRING", "semn": "==", "nr": 2 }
+  ]
+}

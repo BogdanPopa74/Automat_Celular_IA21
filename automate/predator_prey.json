@@ -1,0 +1,23 @@
+{
+  "nume": "Predator-Prey",
+  "tip": "miscare",
+  "stari": { "EMPTY": ".", "RABBIT": "R", "FOX": "F" },
+  "vecini": "moore",
+  "generatii": 10,
+  "seed": 1,
+  "matrice": [
+    "R....R....",
+    "..R.....R.",
+    "....F.....",
+    ".R.....R..",
+    "......F...",
+    "R..R.....R"
+  ],
+  "numara": "RABBIT",
+
+  "gol": "EMPTY",
+  "agenti": {
+    "FOX":    { "mananca": "RABBIT", "energie_start": 5, "energie_castig": 2, "energie_cost": 1, "inmultire_dupa": 0 },
+    "RABBIT": { "mananca": null, "energie_start": null, "inmultire_dupa": 3 }
+  }
+}
