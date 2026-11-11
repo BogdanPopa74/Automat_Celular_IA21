@@ -3,26 +3,17 @@ import os
 import random
 import sys
 
-# Folderul în care se află engine.py – fișierele JSON se caută aici,
-# indiferent din ce folder rulezi comanda.
 FOLDER = os.path.dirname(os.path.abspath(__file__))
 
-# Pozițiile vecinilor față de celula (i, j)
 VECINI = {
     "moore":       [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)],
     "von_neumann": [(-1, 0), (1, 0), (0, -1), (0, 1)],
 }
 
-# Toate automatele stau în folderul "automate", câte un fișier JSON fiecare
-# (lumea + regulile în același fișier). Tipurile posibile:
-#   "vecini"  – celula se schimbă după vecini (Brian's Brain, Forest Fire...)
-#   "miscare" – celule care se mișcă (Predator-Prey, Ecosystem...)
-#   "numere"  – celule cu cifre (Sandpile, Difuzie...)
 FOLDER_AUTOMATE = os.path.join(FOLDER, "automate")
 
 
 def alege_automat():
-    """Afișează automatele din folder; utilizatorul scrie numărul sau numele."""
     fisiere = sorted(f for f in os.listdir(FOLDER_AUTOMATE) if f.endswith(".json"))
     for k, f in enumerate(fisiere, 1):
         print(f"{k}. {f[:-5]}")
@@ -68,7 +59,7 @@ def vecinii(matrice, i, j, directii):
 
 
 # =====================================================================
-# TIP 1: "vecini" – celula își schimbă starea după câți vecini are
+# TIP 1: "vecini" 
 # =====================================================================
 
 def compara(a, semn, b):
@@ -95,21 +86,16 @@ def pas_vecini(matrice, reguli, directii, date):
                 if "daca" in r:
                     nr = numara_vecini(matrice, i, j, r["daca"], directii)
                     prag = r["nr"]
-                    if isinstance(prag, str):      # "nr": "A" -> comparăm cu numărul de vecini A
+                    if isinstance(prag, str):      
                         prag = numara_vecini(matrice, i, j, prag, directii)
                     if not compara(nr, r["semn"], prag):
                         continue
                 noua[i][j] = r["in"]
-                break                              # se aplică doar prima regulă potrivită
+                break                            
     return noua
-
-
-# =====================================================================
-# TIP 2: "miscare" – agenți care se mută, mănâncă, se înmulțesc, mor
-# =====================================================================
+# Tip 2 miscare
 
 def pregateste_miscare(matrice, reguli):
-    """Fiecare agent primește energie și vârstă (ținute în matrici separate)."""
     energie = [[0] * len(matrice[0]) for _ in matrice]
     varsta = [[0] * len(matrice[0]) for _ in matrice]
     for i in range(len(matrice)):
@@ -135,7 +121,6 @@ def pas_miscare(matrice, reguli, directii, date):
     gol = reguli["gol"]
     energie, varsta = date["energie"], date["varsta"]
 
-    # agenții se mișcă pe rând, în ordine aleatoare
     pozitii = [(i, j) for i in range(len(matrice)) for j in range(len(matrice[0]))
                if matrice[i][j] in reguli["agenti"]]
     random.shuffle(pozitii)
@@ -143,23 +128,21 @@ def pas_miscare(matrice, reguli, directii, date):
 
     for (i, j) in pozitii:
         if (i, j) in mutati or matrice[i][j] not in reguli["agenti"]:
-            continue                               # a fost deja mutat sau mâncat
+            continue                             
         agent = reguli["agenti"][matrice[i][j]]
         varsta[i][j] += 1
         vecini = vecinii(matrice, i, j, directii)
 
-        # 1. dacă are mâncare lângă el, merge acolo și mănâncă
         hrana = [p for p in vecini if agent.get("mananca") and matrice[p[0]][p[1]] == agent["mananca"]]
         libere = [p for p in vecini if matrice[p[0]][p[1]] == gol]
         if hrana:
             tinta = random.choice(hrana)
             energie[i][j] += agent.get("energie_castig", 0)
         else:
-            # 2. altfel se mută aleator într-o celulă liberă și pierde energie
             tinta = random.choice(libere) if libere else None
             if agent.get("energie_start") is not None:
                 energie[i][j] -= agent.get("energie_cost", 1)
-                if energie[i][j] <= 0:             # 3. moare dacă nu mai are energie
+                if energie[i][j] <= 0:            
                     matrice[i][j] = gol
                     energie[i][j] = varsta[i][j] = 0
                     continue
@@ -170,7 +153,6 @@ def pas_miscare(matrice, reguli, directii, date):
         muta(matrice, date, (i, j), tinta, gol)
         mutati.add(tinta)
 
-        # 4. înmulțire: după N pași lasă un pui în locul de unde a plecat
         n = agent.get("inmultire_dupa", 0)
         if n and varsta[tinta[0]][tinta[1]] >= n:
             varsta[tinta[0]][tinta[1]] = 0
@@ -181,11 +163,7 @@ def pas_miscare(matrice, reguli, directii, date):
     return matrice
 
 
-# =====================================================================
-# TIP 3: "numere" – celule cu cifre, noua valoare se calculează cu o formulă
-#   x       = valoarea celulei
-#   vecini  = lista valorilor vecinilor
-# =====================================================================
+# Tip 3 numere
 
 def pas_numere(matrice, reguli, directii, date):
     noua = []
@@ -204,10 +182,6 @@ def pas_numere(matrice, reguli, directii, date):
 PASI = {"vecini": pas_vecini, "miscare": pas_miscare, "numere": pas_numere}
 
 
-# =====================================================================
-# Afișare, rulare, răspunsuri
-# =====================================================================
-
 def afiseaza(matrice, automat):
     for rand in matrice:
         if automat["tip"] == "numere":
@@ -223,7 +197,7 @@ def main():
     tip = automat["tip"]
     if tip not in PASI:
         sys.exit(f"Eroare: tipul '{tip}' nu există. Tipuri valide: {list(PASI)}")
-    reguli = automat                  # regulile sunt în același fișier cu lumea
+    reguli = automat                 
 
     random.seed(automat.get("seed"))
     matrice = citeste_matrice(automat)
